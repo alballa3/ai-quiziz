@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,7 +24,11 @@ class ProfileController extends Controller
             'status' => session('status'),
         ]);
     }
-
+    public function updateAIModel(Request $request)
+    {
+        $model = $request->model;
+        User::where('id', Auth::id())->update(['model' => $model]);
+    }
     /**
      * Update the user's profile information.
      */

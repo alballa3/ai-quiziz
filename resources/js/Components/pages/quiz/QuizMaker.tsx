@@ -4,15 +4,16 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { Textarea } from "@/Components/ui/textarea"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs"
 import { Save, Wand2 } from "lucide-react"
 import QuizList from "./QuizList"
 import QuestionForm from "./QuestionForm"
-import type { Quiz, Question } from "../types/quiz"
-import { toast } from "@/components/ui/use-toast"
-import { generateAIQuestion } from "../utils/aiUtils"
+
+import { generateAIQuestion } from "@/lib/aiUtils"
+import { toast } from "@/hooks/use-toast"
+import { Question, Quiz } from "@/types/quiz"
 
 export default function QuizMaker() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([])
@@ -123,6 +124,10 @@ export default function QuizMaker() {
     try {
       const aiQuestion = await generateAIQuestion()
       addQuestion(aiQuestion)
+      toast({
+        title: "Question generated",
+        description: "A new AI-generated question has been added to the quiz.",
+      })
     } catch (error) {
       toast({
         title: "Error",

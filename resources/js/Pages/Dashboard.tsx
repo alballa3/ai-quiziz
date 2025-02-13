@@ -1,4 +1,4 @@
-import { Input } from '@/components/ui/input';
+import QuizMaker from '@/Components/pages/quiz/QuizMaker';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 
@@ -13,11 +13,12 @@ export default function Dashboard() {
         >
             <Head title="Dashboard" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 text-white">
-                    
-                </div>
-            </div>
+            <main className="container mx-auto p-4">
+                <h1 className="mb-8 text-center text-3xl font-bold">
+                    Smart Quiz
+                </h1>
+                <QuizMaker />
+            </main>
         </AuthenticatedLayout>
     );
 }
