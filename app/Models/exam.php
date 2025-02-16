@@ -12,9 +12,12 @@ class exam extends Model
     protected $fillable = [
         "name",
         "description",
+        "questions"
     ];
-    public function quiz(){
-        return $this->hasMany(quiz::class);
+    protected $casts = [
+        'questions'=>'array'
+    ];
+    public function user(){
+        return $this->belongsTo(User::class);
     }
-
 }

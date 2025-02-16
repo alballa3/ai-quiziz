@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ProfileController;
+use App\Models\exam;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -13,14 +16,19 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+Route::get('/test',function(){
+    return csrf_token   ();
+});
+
+Route::controller(ExamController::class)->group(function () {
+    // Route::get('/dashboard/create',"index")->middleware(['auth', 'verified'])->name('make');
+    Route::post('/dashboard/create', "create")->withoutMiddleware(['auth', 'verified']);
+});
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/dashboard/make', function () {
-    return Inertia::render('quiz/create');
-})->middleware(['auth', 'verified'])->name('make');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

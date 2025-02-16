@@ -6,6 +6,8 @@ use App\Models\exam;
 use App\Http\Requests\StoreexamRequest;
 use App\Http\Requests\UpdateexamRequest;
 use Illuminate\Http\Request as HttpRequest;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class ExamController extends Controller
 {
@@ -14,15 +16,23 @@ class ExamController extends Controller
      */
     public function index()
     {
-
+        return Inertia::render('quiz/create');
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create( HttpRequest $request)
+    public function create(HttpRequest $request)
     {
-      
+        $exam = Exam::create(
+            [
+                'user_id' => Auth::user()->id,
+                "name" =>  $request->title,
+                "description" =>  $request->description,
+                'questions' => $request->questions
+            ]
+        );
+        return $exam;
     }
 
     /**
