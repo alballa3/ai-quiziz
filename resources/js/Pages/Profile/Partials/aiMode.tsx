@@ -11,17 +11,18 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/Components/ui/select';
+import { router, usePage } from '@inertiajs/react';
 
 const models = [
     {
-        id: 1,
+        id: 0,
         name: 'deepseek-r1:1.5b',
         description: 'The Fastest Model for generative question.',
         icon: MessageSquare,
         color: 'text-blue-500',
     },
     {
-        id: 2,
+        id: 1,
         name: 'deepseek-r1:7b',
         description:
             'An advanced model for generating human-like text but not that fast.',
@@ -30,7 +31,7 @@ const models = [
     },
 
     {
-        id: 3,
+        id: 2,
         name: 'llama3.2',
         description:
             'A powerful model for generating human-like text and answers.',
@@ -40,8 +41,13 @@ const models = [
 ];
 
 export default function AiModel() {
-    const [selectedModel, setSelectedModel] = useState(1);
-    
+    const test = usePage().props.auth.user;
+    const [selectedModel, setSelectedModel] = useState(function () {
+        return models.findIndex((model) => model.name === test?.model);
+    });
+    const handle = () => {
+        router.put('/profile', { model: models[selectedModel].name });
+    };
     const selectedModelData = models.find(
         (model) => model.id === selectedModel,
     );
@@ -99,7 +105,11 @@ export default function AiModel() {
                     ))}
                 </SelectContent>
             </Select>
-            <Button className="w-[42vh]" disabled={!selectedModel}>
+            <Button
+                className="w-[42vh]"
+                disabled={!selectedModel}
+                onClick={handle}
+            >
                 Confirm Selection
             </Button>
         </div>

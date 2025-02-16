@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/Components/ui/textarea"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/Components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs"
 import { Save, Wand2 } from "lucide-react"
 import QuizList from "./QuizList"
@@ -33,7 +33,7 @@ export default function QuizMaker() {
   useEffect(() => {
     localStorage.setItem("quizzes", JSON.stringify(quizzes))
   }, [quizzes])
-
+  console.log(quizzes)
   const addQuestion = (newQuestion: Question) => {
     if (currentQuiz) {
       const updatedQuiz = {
@@ -59,6 +59,8 @@ export default function QuizMaker() {
   }
 
   const saveQuiz = () => {
+    // console.log(quizzes)
+    // Vaildtion if It Emplty or not
     if (!quizTitle.trim()) {
       toast({
         title: "Error",
@@ -67,6 +69,7 @@ export default function QuizMaker() {
       })
       return
     }
+
     if (currentQuiz) {
       const updatedQuiz = { ...currentQuiz, title: quizTitle, description: quizDescription }
       setQuizzes(quizzes.map((q) => (q.id === currentQuiz.id ? updatedQuiz : q)))

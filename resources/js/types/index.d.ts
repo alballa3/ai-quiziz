@@ -1,4 +1,5 @@
 export interface User {
+    model: string;
     id: number;
     name: string;
     email: string;

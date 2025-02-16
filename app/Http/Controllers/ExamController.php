@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\exam;
 use App\Http\Requests\StoreexamRequest;
 use App\Http\Requests\UpdateexamRequest;
+use Illuminate\Http\Request as HttpRequest;
 
 class ExamController extends Controller
 {
@@ -13,15 +14,15 @@ class ExamController extends Controller
      */
     public function index()
     {
-        //
+
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create( HttpRequest $request)
     {
-        //
+      
     }
 
     /**
