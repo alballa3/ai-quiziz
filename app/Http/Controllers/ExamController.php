@@ -11,12 +11,22 @@ use Inertia\Inertia;
 
 class ExamController extends Controller
 {
+    public function main()
+    {
+        $exams = Exam::where('user_id', Auth::user()->id)->get();
+        return Inertia::render(
+            'Dashboard',
+            ["exams" => $exams]
+        );
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Inertia::render('quiz/create');
+        return Inertia::render(
+            'quiz/create',
+        );
     }
 
     /**
@@ -24,10 +34,11 @@ class ExamController extends Controller
      */
     public function create(HttpRequest $request)
     {
+        // dd($request->all(),Auth::user()->id);
         $exam = Exam::create(
             [
                 'user_id' => Auth::user()->id,
-                "name" =>  $request->title,
+                "title" =>  $request->title,
                 "description" =>  $request->description,
                 'questions' => $request->questions
             ]
@@ -46,9 +57,10 @@ class ExamController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(exam $exam)
+    public function show($id)
     {
-        //
+        $exam = Exam::find($id);
+        return Inertia::render('quiz/show', ['exam' => $exam]);
     }
 
     /**
@@ -70,8 +82,16 @@ class ExamController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(exam $exam)
+    public function destroy($id)
     {
-        //
+        $userId = Auth::user()->id;
+        $exam = Exam::where('id', $id)->where('user_id', $userId)->first();
+        if (!$exam) {
+            return redirect()->route('dashboard')->with('error', 'Quiz not found or you don\'t have permission to delete it');
+        }
+
+        
+        Exam::destroy($id);
+        return redirect()->route('dashboard')->with('success', 'Quiz deleted successfully');
     }
 }

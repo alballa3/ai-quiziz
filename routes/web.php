@@ -21,13 +21,13 @@ Route::get('/test',function(){
 });
 
 Route::controller(ExamController::class)->group(function () {
-    // Route::get('/dashboard/create',"index")->middleware(['auth', 'verified'])->name('make');
-    Route::post('/dashboard/create', "create")->withoutMiddleware(['auth', 'verified']);
+    Route::post('/dashboard/create', "create")->middleware(['auth', 'verified']);
+    Route::get('/dashboard/create',"index")->middleware(['auth', 'verified'])->name('make');
+    Route::get('/exam/{id}', "show");
+    Route::delete('/exam/{id}', "destroy")->middleware(['auth', 'verified']);
+    Route::get('/dashboard', "main")->middleware(['auth', 'verified'])->name('dashboard');
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 
 Route::middleware('auth')->group(function () {
