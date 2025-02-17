@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/Components/ui/button"
 import { ArrowRight } from "lucide-react"
 
 export default function AboutUs() {
@@ -23,7 +23,7 @@ export default function AboutUs() {
           <div className="mt-10 lg:mt-0">
             <div className="aspect-w-5 aspect-h-3 overflow-hidden rounded-lg shadow-lg">
               <img
-                src="/placeholder.svg?height=400&width=600"
+                src="https://9253440.fs1.hubspotusercontent-na1.net/hub/9253440/hubfs/Happy-work-team-cheering-and-celebrating-at-meeting-team-collaboration.jpg?width=1505&height=750&name=Happy-work-team-cheering-and-celebrating-at-meeting-team-collaboration.jpg"
                 alt="Team working together"
                 className="object-cover object-center"
               />
