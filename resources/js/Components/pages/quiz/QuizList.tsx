@@ -30,11 +30,10 @@ export default function QuizList({ quizzes }: QuizListProps) {
                 });
             },
             onFinish: () => {
-                router.reload()
-            }
+                router.reload();
+            },
         });
     };
-
 
     return (
         <div className="space-y-4">

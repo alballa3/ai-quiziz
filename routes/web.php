@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\aiController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ProfileController;
 use App\Models\exam;
@@ -28,6 +29,10 @@ Route::controller(ExamController::class)->group(function () {
     Route::get('/dashboard', "main")->middleware(['auth', 'verified'])->name('dashboard');
 });
 
+
+Route::controller(aiController::class)->group(function () {
+    Route::get('/ai/generate', "generateQuestion")->name('ai.question');
+});
 
 
 Route::middleware('auth')->group(function () {
