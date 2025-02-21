@@ -3,7 +3,7 @@
 import { Bot, Check, Image, MessageSquare } from 'lucide-react';
 import { useState } from 'react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/Components/ui/button';
 import {
     Select,
     SelectContent,
@@ -46,6 +46,7 @@ export default function AiModel() {
         return models.findIndex((model) => model.name === test?.model);
     });
     const handle = () => {
+        console.log(models[selectedModel].name);
         router.put('/profile', { model: models[selectedModel].name });
     };
     const selectedModelData = models.find(
@@ -107,7 +108,7 @@ export default function AiModel() {
             </Select>
             <Button
                 className="w-[42vh]"
-                disabled={!selectedModel}
+                disabled={selectedModel === -1} // Since findIndex() returns -1 if no match
                 onClick={handle}
             >
                 Confirm Selection

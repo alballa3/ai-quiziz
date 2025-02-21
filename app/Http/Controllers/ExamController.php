@@ -63,12 +63,18 @@ class ExamController extends Controller
         return Inertia::render('quiz/show', ['exam' => $exam]);
     }
 
+    public function editPage($id){
+        $exam = Exam::find($id);
+        return Inertia::render('quiz.edit', ['exam' => $exam]);
+    }
+
+
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(exam $exam)
     {
-        //
+        
     }
 
     /**
@@ -90,7 +96,7 @@ class ExamController extends Controller
             return redirect()->route('dashboard')->with('error', 'Quiz not found or you don\'t have permission to delete it');
         }
 
-        
+
         Exam::destroy($id);
         return redirect()->route('dashboard')->with('success', 'Quiz deleted successfully');
     }
