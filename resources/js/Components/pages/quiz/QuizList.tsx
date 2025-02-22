@@ -44,7 +44,7 @@ export default function QuizList({ quizzes }: QuizListProps) {
                             You haven't created any quizzes yet.
                         </p>
                         <Button asChild className="mt-4">
-                            <Link href="/create-quiz">
+                            <Link href="/dashboard/create">
                                 Create Your First Quiz
                             </Link>
                         </Button>
@@ -69,7 +69,7 @@ export default function QuizList({ quizzes }: QuizListProps) {
                                         </Link>
                                     </Button>
                                     <Button variant="outline" size="sm" asChild>
-                                        <Link href={`/edit-quiz/${quiz.id}`}>
+                                        <Link href={`/exam/${quiz.id}/edit`}>
                                             <Edit className="mr-2 h-4 w-4" />
                                             Edit
                                         </Link>

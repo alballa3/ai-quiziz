@@ -3,7 +3,7 @@
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { Textarea } from '@/Components/ui/textarea';
+import { Textarea } from '@/Components/ui/textarea';import { ToastContainer, toast } from 'react-toastify';
 import {
     Card,
     CardContent,
@@ -11,8 +11,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { toast } from '@/hooks/use-toast';
-import { generateAIQuestion } from '@/lib/aiUtils';
+import { useToast } from '@/hooks/use-toast';
 import { Question, Quiz } from '@/types/quiz';
 import { router } from '@inertiajs/react';
 import { Plus, Save, Wand2 } from 'lucide-react';
@@ -30,26 +29,12 @@ export default function QuizMaker() {
         number | null
     >(null);
 
-    useEffect(() => {
-        const savedQuizzes = localStorage.getItem('quizzes');
-        if (savedQuizzes) {
-            const quizzes = JSON.parse(savedQuizzes);
-            const existingQuiz = quizzes.find((q: Quiz) => q.id === quiz.id);
-            if (existingQuiz) {
-                setQuiz(existingQuiz);
-            }
-        }
-    }, [quiz.id]);
-
     const addQuestion = (newQuestion: Question) => {
         setQuiz((prevQuiz) => ({
             ...prevQuiz,
             questions: [...prevQuiz.questions, newQuestion],
         }));
-        toast({
-            title: 'Question added',
-            description: 'Your new question has been added to the quiz.',
-        });
+        toast.success('Your new question has been added to the quiz.');
     };
 
     const updateQuestion = (updatedQuestion: Question, index: number) => {
@@ -60,10 +45,7 @@ export default function QuizMaker() {
             ),
         }));
         setEditingQuestionIndex(null);
-        toast({
-            title: 'Question updated',
-            description: 'Your question has been updated successfully.',
-        });
+        toast.info('Your question has been updated successfully.');
     };
 
     const removeQuestion = (index: number) => {
@@ -71,21 +53,15 @@ export default function QuizMaker() {
             ...prevQuiz,
             questions: prevQuiz.questions.filter((_, i) => i !== index),
         }));
-        toast({
-            title: 'Question removed',
-            description: 'The question has been removed from the quiz.',
-        });
+        toast.warn('The question has been removed from the quiz.');
     };
 
     const saveQuiz = () => {
         if (!quiz.title.trim()) {
-            toast({
-                title: 'Error',
-                description: 'Quiz title cannot be empty.',
-                variant: 'destructive',
-            });
+            toast.error('Quiz title cannot be empty.');
             return;
         }
+        // Check about the questions and change it
         router.post(
             '/dashboard/create',
             {
@@ -96,42 +72,51 @@ export default function QuizMaker() {
             {
                 onError: (error) => {
                     console.error('Error creating quiz:', error);
-                    toast({
-                        title: 'Error',
-                        description: 'Failed to save quiz. Please try again.',
-                        variant: 'destructive',
-                    });
+                    toast.error('Failed to save quiz. Please try again.');
                 },
                 onSuccess: () => {
-                    toast({
-                        title: 'Quiz saved',
-                        description: 'Your quiz has been saved successfully.',
-                    });
+                    toast.success('Your quiz has been saved successfully.');
                 },
             },
         );
-
     };
 
     const generateQuestion = async () => {
         setIsGeneratingQuestion(true);
-        try {
-            const aiQuestion = await generateAIQuestion();
-            addQuestion(aiQuestion);
-        } catch (error) {
-            toast({
-                title: 'Error',
-                description:
-                    'Failed to generate AI question. Please try again.',
-                variant: 'destructive',
-            });
-        } finally {
-            setIsGeneratingQuestion(false);
+        const csrfToken = document
+            ?.querySelector('meta[name="csrf-token"]')
+            ?.getAttribute('content');
+
+        const response = await fetch('/ai/generate/question', {
+            method: 'POST',
+            body: JSON.stringify({
+                title: quiz.title,
+                description: quiz.description,
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken || '',
+                Accept: 'application/json',
+            },
+        });
+        const data = await response.json();
+        setIsGeneratingQuestion(false);
+        if (!response.ok) {
+            console.error('Error generating question:', data.error);
+            toast.error('Failed to generate question.');
+            return;
         }
+
+        const question = Array.isArray(data) ? data[0] : data;
+        addQuestion(question);
+        toast.success('Question generated successfully.');
+
+        console.log(data);
     };
 
     return (
         <Card className="bg-white shadow-lg">
+            <ToastContainer />
             <CardHeader>
                 <CardTitle className="text-2xl text-gray-900">
                     Create a New Quiz
@@ -282,3 +267,4 @@ export default function QuizMaker() {
         </Card>
     );
 }
+

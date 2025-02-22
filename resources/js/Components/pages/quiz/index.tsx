@@ -77,10 +77,10 @@ export default function Dashboard({ quiz = [] }: { quiz: Quiz[] | undefined }) {
                     </CardHeader>
                     <CardContent className="space-y-2">
                         <Button asChild className="w-full">
-                            <Link href="/create-quiz">Create New Quiz</Link>
+                            <Link href="/dashboard/create">Create New Quiz</Link>
                         </Button>
                         <Button asChild className="w-full" variant="outline">
-                            <Link href="/generate-questions">
+                            <Link href="/ai/generate">
                                 <Wand2 className="mr-2 h-4 w-4" />
                                 Generate Questions
                             </Link>

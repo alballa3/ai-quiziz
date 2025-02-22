@@ -18,17 +18,17 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
-Route::get('/test',function(){
-    return csrf_token   ();
+Route::get('/test', function () {
+    return csrf_token();
 });
 
 Route::controller(ExamController::class)->group(function () {
     Route::post('/dashboard/create', "create")->middleware(['auth', 'verified']);
-    Route::get('/dashboard/create',"index")->middleware(['auth', 'verified'])->name('make');
+    Route::get('/dashboard/create', "index")->middleware(['auth', 'verified'])->name('make');
     Route::get('/exam/{id}', "show");
-    Route::get('/exam/{id}/edit', "editPage")->middleware(['auth', 'verified',ownMiddleware::class]);
-    Route::put('/exam/{id}', "edit")->middleware(['auth', 'verified',ownMiddleware::class]);
-    Route::delete('/exam/{id}', "destroy")->middleware(['auth', 'verified',ownMiddleware::class]);
+    Route::get('/exam/{id}/edit', "editPage")->middleware(['auth', 'verified', ownMiddleware::class]);
+    Route::put('/exam/{id}', "edit")->middleware(['auth', 'verified', ownMiddleware::class]);
+    Route::delete('/exam/{id}', "destroy")->middleware(['auth', 'verified', ownMiddleware::class]);
 
     Route::get('/dashboard', "main")->middleware(['auth', 'verified'])->name('dashboard');
 });
@@ -36,7 +36,8 @@ Route::controller(ExamController::class)->group(function () {
 
 Route::controller(aiController::class)->group(function () {
     Route::get('/ai/generate', "generatePage")->name('ai.exam');
-    Route::get('/ai/generate/question', "generateQuestion")->name('ai.question');
+    Route::post('/ai/generate/question', "generateQuestion")->name('ai.question')
+    ->middleware(['auth', 'verified']);
 });
 
 

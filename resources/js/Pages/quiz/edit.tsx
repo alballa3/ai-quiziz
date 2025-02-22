@@ -1,17 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import Header from "@/components/Header"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/Components/ui/button"
+import { Input } from "@/Components/ui/input"
+import { Label } from "@/Components/ui/label"
+import { Textarea } from "@/Components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { toast } from "@/components/ui/use-toast"
+
 import { Loader2, Save, Trash2, GripVertical } from "lucide-react"
-import QuestionForm from "@/components/QuestionForm"
-import type { Quiz, Question } from "@/types/quiz"
 import { motion, AnimatePresence } from "framer-motion"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import {
@@ -22,131 +18,120 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/Components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs"
+import { ScrollArea } from "@/Components/ui/scroll-area"
+import { Question, Quiz } from "@/types/quiz"
+import { toast, ToastContainer } from "react-toastify"
+import Authenticated from "@/Layouts/AuthenticatedLayout"
+import QuestionForm from "@/Components/pages/quiz/QuestionForm"
+import { router, usePage } from "@inertiajs/react"
 
-export default function EditQuiz({ params }: { params: { id: string } }) {
-  const router = useRouter()
+export default function EditQuiz( ) {
   const [quiz, setQuiz] = useState<Quiz | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [editingQuestionIndex, setEditingQuestionIndex] = useState<number | null>(null)
   const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(null)
   const [activeTab, setActiveTab] = useState("edit")
+    const {exam}=usePage().props
 
-  useEffect(() => {
-    const savedQuizzes = localStorage.getItem("quizzes")
-    if (savedQuizzes) {
-      const quizzes: Quiz[] = JSON.parse(savedQuizzes)
-      const foundQuiz = quizzes.find((q) => q.id === params.id)
-      if (foundQuiz) {
-        setQuiz(foundQuiz)
-      } else {
-        toast({
-          title: "Error",
-          description: "Quiz not found.",
-          variant: "destructive",
+    useEffect(() => {
+        setQuiz(exam as Quiz)
+        setIsLoading(false)
+      }, [])
+
+      useEffect(() => {
+        const autosave = setTimeout(() => {
+          if (quiz) {
+            saveQuiz()
+          }
+        }, 3000)
+
+        return () => clearTimeout(autosave)
+      }, [quiz])
+
+      const handleQuizUpdate = (field: keyof Quiz, value: string) => {
+        if (quiz) {
+          setQuiz({ ...quiz, [field]: value })
+        }
+      }
+
+      const addQuestion = (newQuestion: Question) => {
+        if (quiz) {
+          setQuiz({
+            ...quiz,
+            questions: [...quiz.questions, newQuestion],
+          })
+          toast.success("Your new question has been added to the quiz.")
+        }
+      }
+
+      const updateQuestion = (updatedQuestion: Question, index: number) => {
+        if (quiz) {
+          const updatedQuestions = [...quiz.questions]
+          updatedQuestions[index] = updatedQuestion
+          setQuiz({
+            ...quiz,
+            questions: updatedQuestions,
+          })
+          setEditingQuestionIndex(null)
+          toast.success("Your question has been updated successfully.")
+        }
+      }
+
+      const removeQuestion = (index: number) => {
+        if (quiz) {
+          const updatedQuestions = quiz.questions.filter((_, i) => i !== index)
+          setQuiz({
+            ...quiz,
+            questions: updatedQuestions,
+          })
+          toast.info("The question has been removed from the quiz.")
+        }
+        setDeleteConfirmIndex(null)
+      }
+
+      const saveQuiz = () => {
+        if (!quiz) return
+
+        if (!quiz.title.trim()) {
+          toast.error("Quiz title cannot be empty.")
+          return
+        }
+
+        const savedQuizzes = localStorage.getItem("quizzes")
+        const quizzes = savedQuizzes ? JSON.parse(savedQuizzes) : []
+        const updatedQuizzes = quizzes.map((q: Quiz) => (q.id === quiz.id ? quiz : q))
+        localStorage.setItem("quizzes", JSON.stringify(updatedQuizzes))
+        router.put('/exam/{id}',{
+            title: quiz.title,
+            description: quiz.description,
+            questions: quiz.questions ,
+        },{
+            preserveScroll: true,
+            onSuccess: () => {
+              toast.success("Your quiz has been updated successfully.")
+            },
+            onError: () => {
+              toast.error("An error occurred while updating the quiz.")
+            }
         })
-        router.push("/")
+        console.log(quiz)
+        toast.success("Your quiz has been updated successfully.")
       }
-    }
-    setIsLoading(false)
-  }, [params.id, router])
 
-  useEffect(() => {
-    const autosave = setTimeout(() => {
-      if (quiz) {
-        saveQuiz()
+      const onDragEnd = (result: any) => {
+        if (!result.destination || !quiz) return
+
+        const newQuestions = Array.from(quiz.questions)
+        const [reorderedQuestion] = newQuestions.splice(result.source.index, 1)
+        newQuestions.splice(result.destination.index, 0, reorderedQuestion)
+
+        setQuiz({
+          ...quiz,
+          questions: newQuestions,
+        })
       }
-    }, 3000)
-
-    return () => clearTimeout(autosave)
-  }, [quiz])
-
-  const handleQuizUpdate = (field: keyof Quiz, value: string) => {
-    if (quiz) {
-      setQuiz({ ...quiz, [field]: value })
-    }
-  }
-
-  const addQuestion = (newQuestion: Question) => {
-    if (quiz) {
-      setQuiz({
-        ...quiz,
-        questions: [...quiz.questions, newQuestion],
-      })
-      toast({
-        title: "Question added",
-        description: "Your new question has been added to the quiz.",
-      })
-    }
-  }
-
-  const updateQuestion = (updatedQuestion: Question, index: number) => {
-    if (quiz) {
-      const updatedQuestions = [...quiz.questions]
-      updatedQuestions[index] = updatedQuestion
-      setQuiz({
-        ...quiz,
-        questions: updatedQuestions,
-      })
-      setEditingQuestionIndex(null)
-      toast({
-        title: "Question updated",
-        description: "Your question has been updated successfully.",
-      })
-    }
-  }
-
-  const removeQuestion = (index: number) => {
-    if (quiz) {
-      const updatedQuestions = quiz.questions.filter((_, i) => i !== index)
-      setQuiz({
-        ...quiz,
-        questions: updatedQuestions,
-      })
-      toast({
-        title: "Question removed",
-        description: "The question has been removed from the quiz.",
-      })
-    }
-    setDeleteConfirmIndex(null)
-  }
-
-  const saveQuiz = () => {
-    if (!quiz) return
-
-    if (!quiz.title.trim()) {
-      toast({
-        title: "Error",
-        description: "Quiz title cannot be empty.",
-        variant: "destructive",
-      })
-      return
-    }
-
-    const savedQuizzes = localStorage.getItem("quizzes")
-    const quizzes = savedQuizzes ? JSON.parse(savedQuizzes) : []
-    const updatedQuizzes = quizzes.map((q: Quiz) => (q.id === quiz.id ? quiz : q))
-    localStorage.setItem("quizzes", JSON.stringify(updatedQuizzes))
-    toast({
-      title: "Quiz saved",
-      description: "Your quiz has been updated successfully.",
-    })
-  }
-
-  const onDragEnd = (result: any) => {
-    if (!result.destination || !quiz) return
-
-    const newQuestions = Array.from(quiz.questions)
-    const [reorderedQuestion] = newQuestions.splice(result.source.index, 1)
-    newQuestions.splice(result.destination.index, 0, reorderedQuestion)
-
-    setQuiz({
-      ...quiz,
-      questions: newQuestions,
-    })
-  }
 
   if (isLoading) {
     return (
@@ -161,8 +146,8 @@ export default function EditQuiz({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Header />
+    <Authenticated >
+      <ToastContainer />
       <main className="container mx-auto p-4 lg:p-8">
         <h1 className="text-4xl font-bold mb-8 text-gray-900">Edit Quiz</h1>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -419,7 +404,7 @@ export default function EditQuiz({ params }: { params: { id: string } }) {
           </TabsContent>
         </Tabs>
       </main>
-    </div>
+    </Authenticated>
   )
 }
 

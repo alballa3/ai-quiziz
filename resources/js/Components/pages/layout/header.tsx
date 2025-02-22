@@ -129,8 +129,10 @@ export default function Header() {
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>
-                                    <BookOpen className="mr-2 h-4 w-4" />
-                                    My Quizzes
+                                        <BookOpen className="mr-2 h-4 w-4" />
+                                    <Link href="/dashboard">
+                                        My Quizzes
+                                    </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
                                     <Settings className="mr-2 h-4 w-4" />
@@ -225,14 +227,18 @@ export default function Header() {
                                                     className="w-full justify-start"
                                                 >
                                                     <BookOpen className="mr-2 h-4 w-4" />
-                                                    My Quizzes
+                                                    <Link href="/dashboard">
+                                                        My Quizzes
+                                                    </Link>
                                                 </Button>
                                                 <Button
                                                     variant="outline"
                                                     className="w-full justify-start"
                                                 >
                                                     <Settings className="mr-2 h-4 w-4" />
-                                                    Account Settings
+                                                    <Link href="/profile">
+                                                        Account Settings
+                                                    </Link>
                                                 </Button>
                                                 <Button
                                                     variant="destructive"

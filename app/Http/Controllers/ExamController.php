@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Http\Request;
 
 use App\Models\exam;
 use App\Http\Requests\StoreexamRequest;
@@ -34,7 +35,6 @@ class ExamController extends Controller
      */
     public function create(HttpRequest $request)
     {
-        // dd($request->all(),Auth::user()->id);
         $exam = Exam::create(
             [
                 'user_id' => Auth::user()->id,
@@ -43,7 +43,7 @@ class ExamController extends Controller
                 'questions' => $request->questions
             ]
         );
-        return $exam;
+        return redirect()->route('dashboard');
     }
 
     /**
@@ -65,16 +65,26 @@ class ExamController extends Controller
 
     public function editPage($id){
         $exam = Exam::find($id);
-        return Inertia::render('quiz.edit', ['exam' => $exam]);
+        return Inertia::render('quiz/edit', ['exam' => $exam]);
     }
 
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(exam $exam)
+    public function edit($id,Request $request)
     {
-        
+        $request->validate([
+            'title' => 'required|string',
+            'description' => 'required|string',
+            'questions' => 'required|array',
+        ]);
+        $exam = exam::find($id);
+        $exam->title = $request->title;
+        $exam->description = $request->description;
+        $exam->questions = $request->questions;
+        $exam->save();
+        return redirect()->route('dashboard');
     }
 
     /**

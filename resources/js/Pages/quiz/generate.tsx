@@ -15,6 +15,7 @@ import { Slider } from "@/Components/ui/slider"
 import QuestionForm from "@/Components/pages/quiz/QuestionForm"
 import { toast } from "@/hooks/use-toast"
 import { Checkbox } from "@/Components/ui/checkbox"
+import Authenticated from "@/Layouts/AuthenticatedLayout"
 
 const questionTypes: { value: QuestionType; label: string; icon: React.ReactNode }[] = [
   { value: "multiple-choice", label: "Multiple Choice", icon: "☑️" },
@@ -154,7 +155,7 @@ export default function GenerateQuestions() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <Authenticated>
       <main className="container mx-auto p-4">
         <h1 className="text-3xl font-bold mb-8 text-gray-900">Generate Custom Questions</h1>
         <Tabs defaultValue="generate" className="w-full">
@@ -317,7 +318,7 @@ export default function GenerateQuestions() {
           </TabsContent>
         </Tabs>
       </main>
-    </div>
+    </Authenticated>
   )
 }
 

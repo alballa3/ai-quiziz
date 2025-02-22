@@ -2,6 +2,7 @@ import ApplicationLogo from '@/Components/auth/ApplicationLogo';
 import Dropdown from '@/Components/auth/Dropdown';
 import NavLink from '@/Components/auth/NavLink';
 import ResponsiveNavLink from '@/Components/auth/ResponsiveNavLink';
+import { Toast } from '@/components/ui/toast';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState } from 'react';
 
@@ -16,6 +17,7 @@ export default function Authenticated({
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+
             <nav className="border-b border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between">
@@ -142,10 +144,10 @@ export default function Authenticated({
                     <div className="border-t border-gray-200 pb-1 pt-4 dark:border-gray-600">
                         <div className="px-4">
                             <div className="text-base font-medium text-gray-800 dark:text-gray-200">
-                                {user.name}
+                                {user?.name}
                             </div>
                             <div className="text-sm font-medium text-gray-500">
-                                {user.email}
+                                {user?.email}
                             </div>
                         </div>
 

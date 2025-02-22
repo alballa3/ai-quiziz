@@ -10,20 +10,22 @@ class aiController extends Controller
 {
     //
 
-    public function generateQuestion( Request $request){
-        $request->validate([
-            'title' =>'required|string',
-            'description' =>'required|string',
+    public function generateQuestion(Request $request)
+    {
+        $data = $request->validate([
+            'title' => 'required|string',
+            'description' => 'required|string',
         ]);
 
-        // $client=\ArdaGnsrn\Ollama\Ollama::client();
-        // $response=$client->completions()->create([
-        //     'model'=>"exam",
-        //     'prompt'=>"Generate a question  for the following and main idea is about " . $request->title ." and the Hint Help you is " . $request->description,
-        // ]);
-        return response()->json("AFS") ;
+        $client = \ArdaGnsrn\Ollama\Ollama::client();
+        $response = $client->completions()->create([
+            'model' => "exam",
+            'prompt' => "Generate a question  title:" . $data["title"] . " description: " . $data["description"] . "The Number Of questions is one",
+        ]);
+        // return response()->json(json_decode($response->response, true));
     }
-    public function generatePage(){
+    public function generatePage()
+    {
         return Inertia::render('quiz/generate');
     }
 }
