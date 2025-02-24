@@ -1,9 +1,6 @@
 'use client';
 
 import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
-import { Label } from '@/Components/ui/label';
-import { Textarea } from '@/Components/ui/textarea';import { ToastContainer, toast } from 'react-toastify';
 import {
     Card,
     CardContent,
@@ -11,17 +8,20 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Textarea } from '@/Components/ui/textarea';
 import { Question, Quiz } from '@/types/quiz';
 import { router } from '@inertiajs/react';
 import { Plus, Save, Wand2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
 import QuestionForm from './QuestionForm';
 export default function QuizMaker() {
     const [quiz, setQuiz] = useState<Quiz>({
         id: Date.now().toString(),
-        title: '',
-        description: '',
+        title: 'Math Exam',
+        description: 'general math for grade 7',
         questions: [],
     });
     const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false);
@@ -109,8 +109,6 @@ export default function QuizMaker() {
 
         const question = Array.isArray(data) ? data[0] : data;
         addQuestion(question);
-        toast.success('Question generated successfully.');
-
         console.log(data);
     };
 
@@ -267,4 +265,3 @@ export default function QuizMaker() {
         </Card>
     );
 }
-

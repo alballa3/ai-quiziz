@@ -22,7 +22,7 @@ class aiController extends Controller
             'model' => "exam",
             'prompt' => "Generate a question  title:" . $data["title"] . " description: " . $data["description"] . "The Number Of questions is one",
         ]);
-        // return response()->json(json_decode($response->response, true));
+        return response()->json(json_decode($response->response, true));
     }
     public function generatePage()
     {

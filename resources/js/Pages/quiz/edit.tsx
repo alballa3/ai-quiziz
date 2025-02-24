@@ -40,15 +40,7 @@ export default function EditQuiz( ) {
         setIsLoading(false)
       }, [])
 
-      useEffect(() => {
-        const autosave = setTimeout(() => {
-          if (quiz) {
-            saveQuiz()
-          }
-        }, 3000)
 
-        return () => clearTimeout(autosave)
-      }, [quiz])
 
       const handleQuizUpdate = (field: keyof Quiz, value: string) => {
         if (quiz) {
@@ -99,11 +91,7 @@ export default function EditQuiz( ) {
           return
         }
 
-        const savedQuizzes = localStorage.getItem("quizzes")
-        const quizzes = savedQuizzes ? JSON.parse(savedQuizzes) : []
-        const updatedQuizzes = quizzes.map((q: Quiz) => (q.id === quiz.id ? quiz : q))
-        localStorage.setItem("quizzes", JSON.stringify(updatedQuizzes))
-        router.put('/exam/{id}',{
+        router.put(`/exam/${exam?.id}`,{
             title: quiz.title,
             description: quiz.description,
             questions: quiz.questions ,

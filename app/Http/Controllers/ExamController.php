@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 
 use App\Models\exam;
@@ -63,7 +64,8 @@ class ExamController extends Controller
         return Inertia::render('quiz/show', ['exam' => $exam]);
     }
 
-    public function editPage($id){
+    public function editPage($id)
+    {
         $exam = Exam::find($id);
         return Inertia::render('quiz/edit', ['exam' => $exam]);
     }
@@ -72,7 +74,7 @@ class ExamController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id,Request $request)
+    public function edit($id, Request $request)
     {
         $request->validate([
             'title' => 'required|string',
