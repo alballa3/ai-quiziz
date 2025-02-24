@@ -33,7 +33,7 @@ export default function EditQuiz( ) {
   const [editingQuestionIndex, setEditingQuestionIndex] = useState<number | null>(null)
   const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(null)
   const [activeTab, setActiveTab] = useState("edit")
-    const {exam}=usePage().props
+    const { exam } = usePage().props
 
     useEffect(() => {
         setQuiz(exam as Quiz)

@@ -35,6 +35,7 @@ Route::controller(ExamController::class)->group(function () {
 
 
 Route::controller(aiController::class)->group(function () {
+    Route::post('/ai/generate','generateExam');
     Route::get('/ai/generate', "generatePage")->name('ai.exam');
     Route::post('/ai/generate/question', "generateQuestion")->name('ai.question')
     ->middleware(['auth', 'verified']);
@@ -45,7 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, "updateAIModel"]);
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__ . '/auth.php';

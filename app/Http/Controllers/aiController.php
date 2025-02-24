@@ -24,8 +24,25 @@ class aiController extends Controller
         ]);
         return response()->json(json_decode($response->response, true));
     }
+
     public function generatePage()
     {
         return Inertia::render('quiz/generate');
+    }
+    public function generateExam(Request $request)
+    {
+        $data = $request->validate([
+            'title' => 'required|string',
+            'description' => 'required|string',
+            'number_of_questions' => 'required|integer',
+        ]);
+
+
+        $client = \ArdaGnsrn\Ollama\Ollama::client();
+        $response = $client->completions()->create([
+            'model' => "exam",
+            'prompt' => "Generate a question  title:" . $data["title"] . " description: " . $data["description"] . "The Number Of  questions" . $data['number_of_questions'] ,
+        ]);
+        return response()->json(json_decode($response->response, true));
     }
 }
