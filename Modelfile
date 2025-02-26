@@ -1,5 +1,5 @@
 # For Low end pc use llama3.2:1b if it mid use llama3.2
-FROM llama3.2:1b
+FROM llama3.2
 # Set the temperature for more creative outputs
 PARAMETER temperature 2
 

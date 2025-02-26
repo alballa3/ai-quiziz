@@ -1,10 +1,7 @@
 'use client';
 
-import type React from 'react';
-
 import QuestionForm from '@/Components/pages/quiz/QuestionForm';
 import { Button } from '@/Components/ui/button';
-import { Checkbox } from '@/Components/ui/checkbox';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Slider } from '@/Components/ui/slider';
@@ -18,94 +15,22 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { toast } from '@/hooks/use-toast';
-import type { Question, QuestionType } from '@/types/quiz';
+import type {
+    MultipleChoiceQuestion,
+    Question,
+    TrueFalseQuestion,
+} from '@/types/quiz';
+import { router } from '@inertiajs/react';
 import { Edit2, Loader2, Save, Wand2 } from 'lucide-react';
 import { useState } from 'react';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 
-const questionTypes: {
-    value: QuestionType;
-    label: string;
-    icon: React.ReactNode;
-}[] = [
-    { value: 'multiple-choice', label: 'Multiple Choice', icon: '☑️' },
-    { value: 'true-false', label: 'True/False', icon: '✅' },
-];
-
-const difficultyLevels = ['Easy', 'Medium', 'Hard'];
-export async function generateAIQuestion(
-    selectedTypes: QuestionType[],
-    difficulty: string,
-): Promise<Question> {
-    // This is a mock implementation. In a real application, you would call an AI service here.
-    const topics = [
-        'History',
-        'Science',
-        'Literature',
-        'Geography',
-        'Mathematics',
-        'Art',
-        'Music',
-        'Sports',
-    ];
-    const randomTopic = topics[Math.floor(Math.random() * topics.length)];
-    const randomType =
-        selectedTypes[Math.floor(Math.random() * selectedTypes.length)];
-
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            const questionText = `[${difficulty}] What is a famous ${randomTopic.toLowerCase()} fact?`;
-
-            switch (randomType) {
-                case 'multiple-choice':
-                    resolve({
-                        id: Date.now().toString(),
-                        type: 'multiple-choice',
-                        text: questionText,
-                        answers: [
-                            `${randomTopic} fact 1`,
-                            `${randomTopic} fact 2`,
-                            `${randomTopic} fact 3`,
-                            `${randomTopic} fact 4`,
-                        ],
-                        correctAnswer: Math.floor(Math.random() * 4),
-                    });
-                    break;
-                case 'essay':
-                    resolve({
-                        id: Date.now().toString(),
-                        type: 'essay',
-                        text: `[${difficulty}] Write an essay about a significant event or development in ${randomTopic}.`,
-                        sampleAnswer: `A sample essay about a significant event or development in ${randomTopic}...`,
-                    });
-                    break;
-                case 'true-false':
-                    resolve({
-                        id: Date.now().toString(),
-                        type: 'true-false',
-                        text: `[${difficulty}] True or False: ${randomTopic} has always been considered a core academic subject.`,
-                        correctAnswer: Math.random() < 0.5,
-                    });
-                    break;
-                case 'short-answer':
-                    resolve({
-                        id: Date.now().toString(),
-                        type: 'short-answer',
-                        text: `[${difficulty}] Name an important figure in the field of ${randomTopic} and briefly explain their contribution.`,
-                        correctAnswer: `An important figure in ${randomTopic} and their contribution`,
-                    });
-                    break;
-            }
-        }, 1000); // Simulate network delay
-    });
-}
 export default function GenerateQuestions() {
     const [numQuestions, setNumQuestions] = useState(1);
 
-    const [quizTitle, setQuizTitle] = useState('General Math Exam');
+    const [quizTitle, setQuizTitle] = useState('general math');
     const [quizDescription, setQuizDescription] = useState(
-        'A general math exam for students.',
+        'math exam for grade 7',
     );
     const [isGenerating, setIsGenerating] = useState(false);
     const [generatedQuestions, setGeneratedQuestions] = useState<Question[]>(
@@ -117,84 +42,73 @@ export default function GenerateQuestions() {
     const [showPreview, setShowPreview] = useState(false);
 
     const handleGenerate = async () => {
-
         setIsGenerating(true);
-        const csrfToken = document
-            ?.querySelector('meta[name="csrf-token"]')
-            ?.getAttribute('content');
+        try {
+            const csrfToken = document
+                ?.querySelector('meta[name="csrf-token"]')
+                ?.getAttribute('content');
 
-        const response = await fetch('/ai/generate', {
-            method: 'POST',
-            body: JSON.stringify({
-                title: quizTitle,
-                description: quizDescription,
-                number_of_questions: numQuestions,
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken || '',
-                Accept: 'application/json',
-            },
-        });
-        const data = await response.json();
-        console.log(data);
-        if (!response.ok) {
-            console.error('Error generating question:', data);
-            // toast.error('Failed to generate question.');
-            return;
+            const response = await fetch('/ai/generate', {
+                method: 'POST',
+                body: JSON.stringify({
+                    title: quizTitle,
+                    description: quizDescription,
+                    number_of_questions: numQuestions,
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || '',
+                    Accept: 'application/json',
+                },
+            });
+            const data: MultipleChoiceQuestion[] | TrueFalseQuestion[] =
+                await response.json();
+            console.log(data);
+
+            setIsGenerating(false);
+            setGeneratedQuestions(
+                data.map((question) => {
+                    if (question?.type == 'multiple-choice') {
+                        question.answers = question?.options ?? [];
+                        delete question?.options;
+                    }
+                    return question;
+                }),
+            );
+            if (!response.ok) {
+                console.error('Error generating question:', data);
+                throw new Error('Failed to generate questions');
+            }
+        } catch (error) {
+            toast.error(
+                'An error occurred while generating questions, Please Try again Later',
+            ); // Handle general errors
         }
-        setGeneratedQuestions(data)
-        setIsGenerating(false);
-        // try {
-        //     const questions: Question[] = [];
-        //     for (let i = 0; i < numQuestions; i++) {
-        //         const question = await generateAIQuestion(
-        //             selectedTypes,
-        //             difficultyLevels[difficulty],
-        //         );
-        //         questions.push(question);
-        //     }
-        //     setGeneratedQuestions(questions);
-        //     setShowPreview(true);
-        //     toast({
-        //         title: 'Questions generated',
-        //         description: `Successfully generated ${numQuestions} question${numQuestions > 1 ? 's' : ''}.`,
-        //     });
-        // } catch (error) {
-        //     toast({
-        //         title: 'Error',
-        //         description: 'Failed to generate questions. Please try again.',
-        //         variant: 'destructive',
-        //     });
-        // } finally {
-        //     setIsGenerating(false);
-        // }
     };
 
     const handleSave = () => {
         if (!quizTitle.trim()) {
-            toast({
-                title: 'Error',
-                description: 'Please enter a quiz title.',
-                variant: 'destructive',
-            });
+            toast.error('Please enter a quiz title.'); // Error toast for empty title
             return;
         }
-
-        const savedQuizzes = localStorage.getItem('quizzes');
-        const quizzes = savedQuizzes ? JSON.parse(savedQuizzes) : [];
-        const newQuiz = {
-            id: Date.now().toString(),
-            title: quizTitle,
-            description: quizDescription,
-            questions: generatedQuestions,
-        };
-        quizzes.push(newQuiz);
-        localStorage.setItem('quizzes', JSON.stringify(quizzes));
-        toast({
-            title: 'Quiz saved',
-            description: 'Your generated quiz has been saved successfully.',
-        });
+        console.log(generatedQuestions);
+        router.post(
+            '/dashboard/create',
+            {
+                title: quizTitle,
+                description: quizDescription,
+                questions: generatedQuestions,
+            },
+            {
+                onError: (error) => {
+                    console.error('Error creating quiz:', error);
+                    toast.error('Failed to save quiz. Please try again.');
+                },
+                onSuccess: () => {
+                    toast.success('Your quiz has been saved successfully.');
+                },
+            },
+        );
     };
 
     const updateQuestion = (updatedQuestion: Question, index: number) => {
@@ -273,7 +187,7 @@ export default function GenerateQuestions() {
                                     <Slider
                                         id="numQuestions"
                                         min={1}
-                                        max={20}
+                                        max={5}
                                         step={1}
                                         value={[numQuestions]}
                                         onValueChange={(value) =>

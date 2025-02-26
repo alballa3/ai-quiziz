@@ -4,11 +4,12 @@ export interface BaseQuestion {
   id: string
   text: string
   type: QuestionType
+  options?: string[]
 }
 
 export interface MultipleChoiceQuestion extends BaseQuestion {
-  type: "multiple-choice"
-  answers: string[]
+    type: "multiple-choice"
+    answers: string[] 
   correctAnswer: number
 }
 

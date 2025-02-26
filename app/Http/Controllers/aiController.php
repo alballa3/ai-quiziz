@@ -41,7 +41,7 @@ class aiController extends Controller
         $client = \ArdaGnsrn\Ollama\Ollama::client();
         $response = $client->completions()->create([
             'model' => "exam",
-            'prompt' => "Generate a question  title:" . $data["title"] . " description: " . $data["description"] . "The Number Of  questions" . $data['number_of_questions'] ,
+            'prompt' => "Generate a question  title:" . $data["title"] . " description: " . $data["description"] . "The amount of questions are:" . $data['number_of_questions'] . "The question type is multiple-choice" ,
         ]);
         return response()->json(json_decode($response->response, true));
     }

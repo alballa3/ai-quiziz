@@ -107,9 +107,9 @@ export default function QuizMaker() {
             return;
         }
 
+        console.log(data);
         const question = Array.isArray(data) ? data[0] : data;
         addQuestion(question);
-        console.log(data);
     };
 
     return (

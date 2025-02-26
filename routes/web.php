@@ -3,6 +3,7 @@
 use App\Http\Controllers\aiController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ResultController;
 use App\Http\Middleware\ownMiddleware;
 use App\Models\exam;
 use Illuminate\Foundation\Application;
@@ -29,7 +30,8 @@ Route::controller(ExamController::class)->group(function () {
     Route::get('/exam/{id}/edit', "editPage")->middleware(['auth', 'verified', ownMiddleware::class]);
     Route::put('/exam/{id}', "edit")->middleware(['auth', 'verified', ownMiddleware::class]);
     Route::delete('/exam/{id}', "destroy")->middleware(['auth', 'verified', ownMiddleware::class]);
-
+    Route::get('/exam/{id}/result',[ResultController::class, "showResult"])->middleware(['auth', 'verified', ownMiddleware::class]);
+    Route::post('exam/{id}',[ResultController::class, "storeResult"])->middleware(['auth', 'verified', ownMiddleware::class]);
     Route::get('/dashboard', "main")->middleware(['auth', 'verified'])->name('dashboard');
 });
 
