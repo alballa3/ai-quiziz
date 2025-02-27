@@ -12,7 +12,9 @@ class ResultController extends Controller
     //
     public function showResult($id)
     {
-        return Inertia::render('quiz/result', ['exam' => exam::find($id)]);
+        $result = result::where("exam_id", $id)->get();
+        // dd($result);
+        return Inertia::render('quiz/result', ['exam' => exam::find($id), 'result' => $result]);
     }
     public function storeResult($id, Request $request)
     {

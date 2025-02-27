@@ -1,4 +1,4 @@
-'use client';
+
 
 import QuizList from '@/Components/pages/quiz/QuizList';
 import { Button } from '@/Components/ui/button';

@@ -1,4 +1,3 @@
-'use client';
 
 import { useEffect, useState } from 'react';
 
@@ -41,12 +40,11 @@ export default function TakeQuiz() {
     const [studentName, setStudentName] = useState('');
     const [quizStarted, setQuizStarted] = useState(false);
     const { exam } = usePage().props;
-
     useEffect(() => {
         setQuiz(exam as Quiz);
-        console.log(quiz);
         setIsLoading(false);
     }, []);
+    console.log(quiz);
     const handleStartQuiz = () => {
         if (studentName.trim() === '') {
             toast.error('Please enter your name to start the quiz.');
@@ -154,7 +152,8 @@ export default function TakeQuiz() {
     const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
 
     const handleFinish = async () => {
-        if (!quiz) return;
+        if (!quiz) return "ERROR";
+        console.log("SUBMIT");
         const quizResult: QuizResult = {
             quizId: quiz.id,
             studentName,
@@ -166,9 +165,13 @@ export default function TakeQuiz() {
             ?.querySelector('meta[name="csrf-token"]')
             ?.getAttribute('content');
 
-        const response = await fetch(`exam/${quizResult.quizId}`, {
+        const response = await fetch(`/exam/${quiz.id}`, {
             method: 'POST',
-            body: JSON.stringify(quizResult),
+            body: JSON.stringify({
+                name: quizResult.studentName,
+                score: quizResult.score,
+                answers: quizResult.answers,
+            }),
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken || '',
@@ -176,12 +179,8 @@ export default function TakeQuiz() {
             },
         });
         const data = await response.json();
+        setShowResults(true);
         console.log(data);
-
-        const savedResults = localStorage.getItem('quizResults');
-        const results = savedResults ? JSON.parse(savedResults) : [];
-        results.push(quizResult);
-        localStorage.setItem('quizResults', JSON.stringify(results));
     };
 
     return (
@@ -227,7 +226,7 @@ export default function TakeQuiz() {
                                                         {index + 1}.{' '}
                                                         {question.text.substring(
                                                             0,
-                                                            20,
+                                                            5,
                                                         )}
                                                         ...
                                                     </Button>
@@ -411,11 +410,12 @@ export default function TakeQuiz() {
                                     </Button>
                                     <Button
                                         onClick={() => {
-                                            handleNext();
-                                            return (
-                                                currentQuestionIndex ===
-                                                quiz.questions.length - 1 ? handleNext():handleFinish()
-                                            );
+
+                                            if (currentQuestionIndex === quiz.questions.length - 1) {
+                                                handleFinish();
+                                            } else {
+                                                handleNext();
+                                            }
                                         }}
                                     >
                                         {currentQuestionIndex ===
@@ -522,9 +522,7 @@ export default function TakeQuiz() {
                             </div>
                         </CardContent>
                         <CardFooter>
-                            <Button onClick={handleFinish} className="w-full">
-                                Back to Dashboard
-                            </Button>
+
                         </CardFooter>
                     </Card>
                 )}

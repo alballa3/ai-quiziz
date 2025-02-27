@@ -1,5 +1,3 @@
-'use client';
-
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -30,9 +28,8 @@ import {
 } from '@/Components/ui/table';
 import Authenticated from '@/Layouts/AuthenticatedLayout';
 import type { Question, Quiz } from '@/types/quiz';
-import { router, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import {
-    ArrowLeft,
     ClipboardList,
     Eye,
     Loader2,
@@ -44,11 +41,11 @@ import { useEffect, useState } from 'react';
 
 interface QuizResult {
     quizId: string;
-    studentName: string;
+    name: string;
     score: number;
     totalQuestions: number;
     answers: Record<string, string | boolean | number>;
-    completedAt: string;
+    created_at: string;
 }
 
 export default function QuizResults({ params }: { params: { id: string } }) {
@@ -58,58 +55,78 @@ export default function QuizResults({ params }: { params: { id: string } }) {
     const [sortBy, setSortBy] = useState<'name' | 'score' | 'date'>('date');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
     const [searchTerm, setSearchTerm] = useState('');
-    const {exam}=usePage().props;
 
+    const { exam, result } = usePage().props as unknown as {
+        exam: Quiz;
+        result: QuizResult[];
+    };
+
+    // useEffect(() => {
+    //     const fetchQuizAndResults = () => {
+    //         setQuiz(exam);
+    //         setResults(result);
+    //         console.log(results)
+
+    //         // Issue Come From Here
+
+    //         // const foundQuiz = quiz?.find((q:any) => q.id === params.id);
+    //         // const quizResults = result?.filter(
+    //         //     (r:any) => r.quizId === params.id,
+    //         // );
+
+    //         // if (savedQuizzes && savedResults) {
+    //         //     const quizzes: Quiz[] = JSON.parse(savedQuizzes);
+    //         //     const allResults: QuizResult[] = JSON.parse(savedResults);
+
+    //         //     if (foundQuiz) {
+    //         //     } else {
+    //         //         // toast({
+    //         //         //     title: 'Error',
+    //         //         //     description: 'Quiz not found.',
+    //         //         //     variant: 'destructive',
+    //         //         // });
+    //         //     }
+    //         // }
+    //         setIsLoading(false);
+    //     };
+
+    //     fetchQuizAndResults();
+    // }, []);
+   
+    console.log()
     useEffect(() => {
-        const fetchQuizAndResults = () => {
-            const savedQuizzes = localStorage.getItem('quizzes');
-            const savedResults = localStorage.getItem('quizResults');
+        console.log('Exam data from props:', exam); // Debugging
+        console.log('Result data from props:', result); // Debugging
 
-            setQuiz(exam as Quiz);
-            // setResults(quizResults);
-            if (savedQuizzes && savedResults) {
-                const quizzes: Quiz[] = JSON.parse(savedQuizzes);
-                const allResults: QuizResult[] = JSON.parse(savedResults);
-
-                const foundQuiz = quizzes.find((q) => q.id === params.id);
-                const quizResults = allResults.filter(
-                    (r) => r.quizId === params.id,
-                );
-
-                if (foundQuiz) {
-                } else {
-                    // toast({
-                    //     title: 'Error',
-                    //     description: 'Quiz not found.',
-                    //     variant: 'destructive',
-                    // });
-                }
-            }
-            setIsLoading(false);
-        };
-
-        fetchQuizAndResults();
-    }, []);
+        if (result.length > 0) {
+            setQuiz(exam);
+            setResults(result);
+        } else {
+            // Handle empty result array case
+            console.log('Result is empty:', result);
+        }
+        setIsLoading(false);
+    }, [exam, result]); // Make sure these are dependencies for re-fetching when props change
 
     const sortedAndFilteredResults = results
         .filter((result) =>
-            result.studentName.toLowerCase().includes(searchTerm.toLowerCase()),
+            result.name.toLowerCase().includes(searchTerm.toLowerCase()),
         )
         .sort((a, b) => {
             if (sortBy === 'name') {
                 return sortOrder === 'asc'
-                    ? a.studentName.localeCompare(b.studentName)
-                    : b.studentName.localeCompare(a.studentName);
+                    ? a.name.localeCompare(b.name)
+                    : b.name.localeCompare(a.name);
             } else if (sortBy === 'score') {
                 return sortOrder === 'asc'
                     ? a.score - b.score
                     : b.score - a.score;
             } else {
                 return sortOrder === 'asc'
-                    ? new Date(a.completedAt).getTime() -
-                          new Date(b.completedAt).getTime()
-                    : new Date(b.completedAt).getTime() -
-                          new Date(a.completedAt).getTime();
+                    ? new Date(a.created_at).getTime() -
+                          new Date(b.created_at).getTime()
+                    : new Date(b.created_at).getTime() -
+                          new Date(a.created_at).getTime();
             }
         });
 
@@ -140,17 +157,9 @@ export default function QuizResults({ params }: { params: { id: string } }) {
     }
 
     return (
-        <Authenticated >
+        <Authenticated>
             <main className="container mx-auto p-4 lg:p-8">
                 <div className="mb-8 flex items-center">
-                    <Button
-                        variant="ghost"
-                        // onClick={() => router.push('/')}
-                        className="mr-4"
-                    >
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Dashboard
-                    </Button>
                     <h1 className="text-4xl font-bold text-gray-900">
                         {quiz.title} - Results
                     </h1>
@@ -320,20 +329,20 @@ export default function QuizResults({ params }: { params: { id: string } }) {
                                         {sortedAndFilteredResults.map(
                                             (result, index) => (
                                                 <TableRow
-                                                    key={`${result.quizId}-${result.studentName}-${result.completedAt}`}
+                                                    key={`${result.quizId}-${result.name}-${result.created_at}`}
                                                 >
                                                     <TableCell className="font-medium">
                                                         {index + 1}
                                                     </TableCell>
                                                     <TableCell>
-                                                        {result.studentName}
+                                                        {result.name}
                                                     </TableCell>
                                                     <TableCell>
                                                         {result.score}%
                                                     </TableCell>
                                                     <TableCell>
                                                         {new Date(
-                                                            result.completedAt,
+                                                            result.created_at,
                                                         ).toLocaleString()}
                                                     </TableCell>
                                                     <TableCell className="text-right">
@@ -353,7 +362,7 @@ export default function QuizResults({ params }: { params: { id: string } }) {
                                                                 <DialogHeader>
                                                                     <DialogTitle>
                                                                         {
-                                                                            result.studentName
+                                                                            result.name
                                                                         }
                                                                         's
                                                                         Answers
@@ -362,7 +371,7 @@ export default function QuizResults({ params }: { params: { id: string } }) {
                                                                         Completed
                                                                         on{' '}
                                                                         {new Date(
-                                                                            result.completedAt,
+                                                                            result.created_at,
                                                                         ).toLocaleString()}
                                                                     </DialogDescription>
                                                                 </DialogHeader>
@@ -382,6 +391,7 @@ export default function QuizResults({ params }: { params: { id: string } }) {
                                                                                     Question{' '}
                                                                                     {qIndex +
                                                                                         1}
+
                                                                                     :{' '}
                                                                                     {
                                                                                         question.text

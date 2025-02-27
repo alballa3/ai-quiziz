@@ -1,4 +1,4 @@
-"use client"
+
 
 import { useState, useEffect } from "react"
 import { Button } from "@/Components/ui/button"
@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/Components/ui/radio-group"
 import { Textarea } from "@/Components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
 import { PlusCircle, X } from "lucide-react"
-import { Question } from "@/types/quiz"
+import { Question, QuestionType } from "@/types/quiz"
 
 interface QuestionFormProps {
   onAddQuestion: (question: Question) => void

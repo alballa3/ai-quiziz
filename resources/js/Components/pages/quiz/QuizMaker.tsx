@@ -1,5 +1,3 @@
-'use client';
-
 import { Button } from '@/Components/ui/button';
 import {
     Card,
@@ -99,16 +97,40 @@ export default function QuizMaker() {
                 Accept: 'application/json',
             },
         });
-        const data = await response.json();
+        const data: Question[] | Question = await response.json();
         setIsGeneratingQuestion(false);
-        if (!response.ok) {
-            console.error('Error generating question:', data.error);
-            toast.error('Failed to generate question.');
+        if (!response.ok || Object.keys(data).length === 0) {
+            console.error('Error generating question:', data);
+            toast.error('Failed to generate question, Try again please');
             return;
         }
+        // const question = Array.isArray(data) ? data[0] : data;
 
-        console.log(data);
-        const question = Array.isArray(data) ? data[0] : data;
+        // {
+        //     "type": "true-false",
+        //     "text": "A prime number can be divided evenly by 2, 3 and 5.",
+        //     "correctAnswer": true,
+        //     "id": "1740640675052"
+        // }
+        const question = Array.isArray(data)
+            ? data.map((question) => ({
+                  ...question,
+                  id: Date.now().toString(),
+              }))[0]
+            : { ...data, id: Date.now().toString() };
+        console.log(question);
+        // const a:Record<string,any> = [{
+        //     "correctAnswer": true,
+        //     "text": "Is 6^(-2) greater than or equal to zero?",
+        //     "type": "true-false"
+        // }]
+        // const b=Array.isArray(a)? a.map((question) => ({...question, id: Date.now().toString() })) : [{...a, id: Date.now().toString() }];
+        // console.log(b);
+
+        // a.map((question) =>  question.id =Date.now().toString());
+        // console.log(a);
+        // a.map((question) =>  question.id =Date.now().toString());
+
         addQuestion(question);
     };
 

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import { Quiz } from '@/types/quiz';
 import { Link, router } from '@inertiajs/react';
-import { Edit, Eye, Play, Trash2 } from 'lucide-react';
+import { BarChart, Edit, Play, Trash2 } from 'lucide-react';
 interface QuizListProps {
     quizzes: Quiz[];
 }
@@ -30,7 +30,7 @@ export default function QuizList({ quizzes }: QuizListProps) {
                 });
             },
             onFinish: () => {
-                router.reload();
+                window.location.reload();
             },
         });
     };
@@ -63,9 +63,9 @@ export default function QuizList({ quizzes }: QuizListProps) {
                                 </span>
                                 <div className="space-x-2">
                                     <Button variant="outline" size="sm" asChild>
-                                        <Link href={`/preview-quiz/${quiz.id}`}>
-                                            <Eye className="mr-2 h-4 w-4" />
-                                            Preview
+                                        <Link href={`/exam/${quiz.id}/result`}>
+                                            <BarChart className="mr-2 h-4 w-4" />
+                                            View Results
                                         </Link>
                                     </Button>
                                     <Button variant="outline" size="sm" asChild>
