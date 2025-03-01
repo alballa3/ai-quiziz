@@ -30,12 +30,5 @@ Teacher Dashboard – Automatically generates quizzes and provides answer key op
 
 This project aims to streamline the quiz-making process, making it faster and more efficient for educators.
 
-Requirement
 
-Device Support: Teachers are encouraged to use their own devices during the project. In some cases, devices may be requested from the teacher to accommodate specific class needs.
-
-Project By: Mohammed Elmuiz
-
-Managed by : teacher mohammed
-
-Class : 12 / 1
+ 
